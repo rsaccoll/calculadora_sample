@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'info.solidsoft.pitest' version '1.7.4'
+    id 'jacoco'
+}
+
+group 'org.example.calculadora'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+    //finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+      element = 'CLASS'
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 1.0
+      }
+      excludes = [
+          'com.example.calc.Terminal',
+      ]
+        }
+    }
+}
+
+pitest {
+    targetClasses = ['com.example.calc.*']
+    targetTests = ['com.calc.test.*',]
+    pitestVersion = '1.7.4'
+    threads = 4
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    mutators = ['ALL']
+}
